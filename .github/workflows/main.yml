@@ -1,0 +1,14 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Github Pages Custom Deploy
+      uses: sterlingwes/gh-pages-deploy-action@v1.1
+
