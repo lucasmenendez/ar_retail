@@ -249,16 +249,11 @@
       this.detector = new TrunkDetector({
         video: this.video
       });
-      this.canvas = new Canvas('canvas', this.video, width, height, '/assets/jacket.png');
+      this.canvas = new Canvas('canvas', this.video, width, height, '../assets/jacket.png');
       this.webcam.init();
     }
 
     _createClass(ARApp, [{
-      key: "capture",
-      value: function capture() {
-        console.log(this.canvas.pose);
-      }
-    }, {
       key: "resume",
       value: function resume() {
         var _this = this;
