@@ -17,7 +17,7 @@ class ARApp {
             this.video, 
             width, 
             height,
-            '../assets/jacket.png'
+            './assets/jacket.png'
         );
 
         this.webcam.init();
