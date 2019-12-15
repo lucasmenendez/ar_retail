@@ -1,5 +1,5 @@
 class Canvas {
-    constructor(id, video, width, height, img) {
+    constructor(id, video, width, height) {
         this.elem = document.getElementById(id);
         this.video = video;
         
@@ -8,10 +8,7 @@ class Canvas {
         this.context = this.elem.getContext('2d');
 
         this.anchor = null;
-
-        this.image = new Image();
-        this.image.onload = () => this.__loop();
-        this.image.src = img
+        this.__loop();
     }
 
     __loop() {
@@ -22,7 +19,7 @@ class Canvas {
             this.elem.width, 
             this.elem.height
         );
-
+        
         if (this.anchor) this.__drawImage(this.anchor);
         
         window.requestAnimationFrame(() => this.__loop() );
@@ -43,12 +40,8 @@ class Canvas {
         this.context.fill();
     }
 
-    __drawImage({ x, y }) {
-        this.context.drawImage(
-            this.image, 
-            x - this.image.width / 2, 
-            y - 15
-        )
+    __drawImage({ img, x, y }) {
+        this.context.drawImage(img, x, y);
     }
 }
 

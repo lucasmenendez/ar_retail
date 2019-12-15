@@ -17,24 +17,6 @@
             }
 
             #video { display: none; }
-
-            #control {
-                position: fixed;
-                z-index: 1;
-                left: 50%;
-                bottom: 100px;
-                font-size: 20px;
-                transform: translateX(-50%)
-            }
-
-            #capture {
-                position: fixed;
-                z-index: 1;
-                left: 50%;
-                bottom: 50px;
-                font-size: 20px;
-                transform: translateX(-50%);
-            }
         </style>
 
         <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
@@ -42,9 +24,6 @@
     <body>
         <canvas id="canvas"></canvas>
         <video id="video" playsinline style="transform: scaleX(-1);"></video>
-
-        <button id="control">ON / OFF</button>
-        <button id="capture">CAPTURE</button>
 
         <script src="public/bundle.js"></script>
     </body>

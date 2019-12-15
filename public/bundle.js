@@ -89,6 +89,8 @@
   /*#__PURE__*/
   function () {
     function TrunkDetector(_ref) {
+      var _this = this;
+
       var video = _ref.video,
           _ref$callback = _ref.callback,
           callback = _ref$callback === void 0 ? null : _ref$callback,
@@ -113,21 +115,15 @@
       this.video = video;
       this.callback = callback;
       this.options = options;
+      this.net = ml5.poseNet(this.video, this.options, function () {
+        return _this.ready();
+      });
     }
 
     _createClass(TrunkDetector, [{
       key: "onDetect",
       value: function onDetect(callback) {
         this.callback = callback;
-      }
-    }, {
-      key: "start",
-      value: function start() {
-        var _this = this;
-
-        this.net = ml5.poseNet(this.video, this.options, function () {
-          return _this.ready();
-        });
       }
     }, {
       key: "ready",
@@ -153,7 +149,6 @@
       key: "detected",
       value: function detected(estimation) {
         if (estimation && this.callback) {
-          console.log(estimation.pose);
           var anchor = this.calcAnchor(estimation.pose);
           this.callback(anchor);
         }
@@ -166,9 +161,7 @@
   var Canvas =
   /*#__PURE__*/
   function () {
-    function Canvas(id, video, width, height, img) {
-      var _this = this;
-
+    function Canvas(id, video, width, height) {
       _classCallCheck(this, Canvas);
 
       this.elem = document.getElementById(id);
@@ -177,24 +170,19 @@
       this.elem.height = height;
       this.context = this.elem.getContext('2d');
       this.anchor = null;
-      this.image = new Image();
 
-      this.image.onload = function () {
-        return _this.__loop();
-      };
-
-      this.image.src = img;
+      this.__loop();
     }
 
     _createClass(Canvas, [{
       key: "__loop",
       value: function __loop() {
-        var _this2 = this;
+        var _this = this;
 
         this.context.drawImage(this.video, 0, 0, this.elem.width, this.elem.height);
         if (this.anchor) this.__drawImage(this.anchor);
         window.requestAnimationFrame(function () {
-          return _this2.__loop();
+          return _this.__loop();
         });
       }
     }, {
@@ -225,13 +213,118 @@
     }, {
       key: "__drawImage",
       value: function __drawImage(_ref3) {
-        var x = _ref3.x,
+        var img = _ref3.img,
+            x = _ref3.x,
             y = _ref3.y;
-        this.context.drawImage(this.image, x - this.image.width / 2, y - 15);
+        this.context.drawImage(img, x, y);
       }
     }]);
 
     return Canvas;
+  }();
+
+  var Models = {
+    BLACK: {
+      img: './assets/black.png',
+      name: 'A0129 GORE-TEX PACLITE® PRODUCT TECHNOLOGY WITH PRIMALOFT® INSULATION',
+      prize: 799.00,
+      url: 'https://www.stoneisland.com/es/stone-island/blazer_cod41890405tb.html'
+    },
+    RED: {
+      img: './assets/red.png',
+      name: '43031 DAVID LIGHT-TC WITH MICROPILE',
+      prize: 660.00,
+      url: 'https://www.stoneisland.com/es/stone-island/cazadora_cod41890734ur.html'
+    },
+    BROWN: {
+      img: './assets/brown.png',
+      name: '70631 DAVID LIGHT-TC WITH MICROPILE',
+      prize: 799.00,
+      url: 'https://www.stoneisland.com/es/stone-island/chaqueton_cod41890540lb.html'
+    }
+  };
+  var Sizes = {
+    S: 'S',
+    M: 'M',
+    L: 'L',
+    XL: 'XL'
+  };
+
+  var Jacket =
+  /*#__PURE__*/
+  function () {
+    function Jacket(model, size, onLoad) {
+      _classCallCheck(this, Jacket);
+
+      this.__current = model;
+      this.__size = size;
+      this.__base = {
+        width: 398,
+        height: 641
+      };
+      this.__callback = onLoad;
+
+      this.__init();
+    }
+
+    _createClass(Jacket, [{
+      key: "__init",
+      value: function __init() {
+        var _this = this;
+
+        this.__image = new Image();
+
+        this.__image.onload = function () {
+          return _this.__callback();
+        };
+
+        this.__image.src = this.__current.img;
+        this.__image.width = this.size.width;
+        this.__image.height = this.size.height;
+      }
+    }, {
+      key: "img",
+      value: function img() {
+        return this.__image;
+      }
+    }, {
+      key: "size",
+      value: function size() {
+        switch (this.__size) {
+          case Sizes.S:
+            return {
+              width: this.__base.width - 10,
+              height: this.__base.height - 10
+            };
+
+          case Sizes.L:
+            return {
+              width: this.__base.width + 10,
+              height: this.__base.height + 10
+            };
+
+          case Sizes.XL:
+            return {
+              width: this.__base.width + 20,
+              height: this.__base.height + 20
+            };
+
+          default:
+            return this.__base;
+        }
+      }
+    }, {
+      key: "offset",
+      value: function offset() {
+        var size = this.size();
+        return {
+          x: -size.width / 2,
+          y: 0
+        };
+      }
+    }]);
+
+    return Jacket;
   }();
 
   var ARApp =
@@ -246,43 +339,29 @@
         width: width,
         height: height
       });
+      this.webcam.init();
       this.detector = new TrunkDetector({
         video: this.video
       });
-      this.canvas = new Canvas('canvas', this.video, width, height, './assets/jacket.png');
-      this.webcam.init();
+      this.canvas = new Canvas('canvas', this.video, width, height);
     }
 
     _createClass(ARApp, [{
-      key: "resume",
-      value: function resume() {
+      key: "start",
+      value: function start() {
         var _this = this;
 
-        console.log("Starting detector...");
-        this.detector.start();
-        this.detector.onDetect(function (center) {
-          _this.canvas.anchor = center;
+        this.detector.onDetect(function (anchor) {
+          var jacket = new Jacket(Models.BROWN, Sizes.M, function () {
+            var offset = jacket.offset();
+            console.log(offset);
+            _this.canvas.anchor = {
+              img: jacket.img(),
+              x: anchor.x + offset.x,
+              y: anchor.y + offset.y
+            };
+          });
         });
-      }
-    }, {
-      key: "pause",
-      value: function pause() {
-        console.log("Stopping detector...");
-        this.detector = new TrunkDetector({
-          video: this.video
-        });
-      }
-    }, {
-      key: "confidenceArea",
-      value: function confidenceArea() {
-        var enabled = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-        var area = {
-          x: this.video.width / 2 - 250,
-          y: this.video.height / 6,
-          w: 500,
-          h: this.video.height * 4 / 5
-        };
-        this.canvas.detectionArea = enabled ? area : null;
       }
     }]);
 
@@ -291,14 +370,7 @@
 
   var video = document.getElementById("video");
   var app = new ARApp(video, 1024, 1024);
-  var enabled = false;
-  document.getElementById("control").addEventListener("click", function () {
-    if (enabled) app.pause();else app.resume();
-    enabled = !enabled;
-  });
-  document.getElementById("capture").addEventListener("click", function () {
-    app.capture();
-  });
+  app.start();
 
 }());
 //# sourceMappingURL=bundle.js.map

@@ -1,54 +1,43 @@
 import Webcam from './webcam.js'
 import TrunkDetector from './trunkDetector.js'
 import Canvas from './canvas'
+import { Jacket, Sizes, Models } from './jacket.js'
 
 class ARApp {
     constructor(video, width, height) {
         this.video = video;
+
         this.webcam = new Webcam({ 
             video: this.video, 
             width: width,
             height: height
         });
-
-        this.detector = new TrunkDetector({ video: this.video });
+        this.webcam.init();
+        
+        this.detector = new TrunkDetector({ video: this.video });  
+        
         this.canvas = new Canvas(
             'canvas', 
             this.video, 
             width, 
-            height,
-            './assets/jacket.png'
+            height
         );
-
-        this.webcam.init();
     }
 
-    resume() {
-        console.log("Starting detector...");
-        this.detector.start();
+    start() {
+        this.detector.onDetect((anchor) => {
+            let jacket = new Jacket(Models.BROWN, Sizes.M, () => {
+                let offset = jacket.offset();
+                console.log(offset);
 
-        this.detector.onDetect((center) => {
-            this.canvas.anchor = center;
+                this.canvas.anchor = {
+                    img: jacket.img(),
+                    x: anchor.x + offset.x,
+                    y: anchor.y + offset.y
+                }
+            });
         });
     }
-
-    pause() {
-        console.log("Stopping detector...");
-
-        this.detector = new TrunkDetector({ video: this.video });
-    }
-
-    confidenceArea(enabled = true) {
-        let area = {
-            x: (this.video.width / 2) - 250,
-            y: this.video.height / 6,
-            w: 500,
-            h: (this.video.height * 4 / 5)
-        }
-
-        this.canvas.detectionArea = enabled ? area : null;
-    }
-
 }
 
 export default ARApp;

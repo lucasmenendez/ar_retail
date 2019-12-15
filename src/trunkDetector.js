@@ -20,11 +20,7 @@ class TrunkDetector {
         this.video = video;
         this.callback = callback;
         this.options = options;
-    }
 
-    onDetect(callback) { this.callback = callback; }
-
-    start() {
         this.net = ml5.poseNet(
             this.video, 
             this.options, 
@@ -32,9 +28,10 @@ class TrunkDetector {
         );
     }
 
+    onDetect(callback) { this.callback = callback; }
+
     ready() {
         console.log("Detector started!");
-
         this.net.on("pose", res => this.detected(res[0]));
     }
 
@@ -61,7 +58,6 @@ class TrunkDetector {
 
     detected(estimation) {
         if (estimation && this.callback) {
-            console.log(estimation.pose);
             let anchor = this.calcAnchor(estimation.pose);
             this.callback(anchor);
         }
