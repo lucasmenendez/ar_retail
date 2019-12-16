@@ -17,26 +17,54 @@ class ARApp {
         this.detector = new TrunkDetector({ video: this.video });  
         
         this.canvas = new Canvas(
-            'canvas', 
+            'camera', 
             this.video, 
             width, 
             height
         );
+
+        this.__current = {
+            model: null,
+            size: Sizes.M
+        };
     }
 
     start() {
         this.detector.onDetect((anchor) => {
-            let jacket = new Jacket(Models.BROWN, Sizes.M, () => {
-                let offset = jacket.offset();
-                console.log(offset);
-
-                this.canvas.anchor = {
-                    img: jacket.img(),
-                    x: anchor.x + offset.x,
-                    y: anchor.y + offset.y
-                }
-            });
+            if (this.__current.model) {
+                new Jacket(
+                    this.__current.model, 
+                    this.__current.size, 
+                    jacket => {
+                        let offset = jacket.offset();
+        
+                        this.canvas.anchor = {
+                            img: jacket.img(),
+                            x: anchor.x + offset.x,
+                            y: anchor.y + offset.y - 20
+                        }
+                    }
+                );
+            }
         });
+    }
+
+    jacket(model) {
+        switch(model) {
+            case "black":
+                this.__current.model = Models.BLACK
+                break
+            case "red":
+                this.__current.model = Models.RED
+                break
+            case "brown":
+                this.__current.model = Models.BROWN
+                break
+        }
+    }
+
+    size(size) {
+        if (Object.values(Sizes).includes(size)) this.__current.size = size;
     }
 }
 

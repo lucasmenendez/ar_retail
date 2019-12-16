@@ -1,6 +1,12 @@
 import ARApp from './app'
+import UI from './ui';
 
-let video = document.getElementById("video");
+let ui = new UI();
+let app = new ARApp(ui.video, 1024, 768);
 
-let app = new ARApp(video, 1024, 1024);
+ui.onSelectJacket(model => {
+    app.jacket(model);
+});
+
 app.start();
+

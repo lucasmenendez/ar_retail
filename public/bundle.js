@@ -130,7 +130,6 @@
       value: function ready() {
         var _this2 = this;
 
-        console.log("Detector started!");
         this.net.on("pose", function (res) {
           return _this2.detected(res[0]);
         });
@@ -141,7 +140,7 @@
         var x = [pose.leftShoulder.x, pose.rightShoulder.x, pose.leftHip.x, pose.rightHip.x];
         var y = [pose.leftShoulder.y, pose.rightShoulder.y, pose.leftHip.y, pose.rightHip.y];
         return {
-          x: (Math.min.apply(Math, x) + Math.max.apply(Math, x)) / 2,
+          x: pose.nose.x,
           y: (pose.nose.y + Math.min.apply(Math, y)) / 2
         };
       }
@@ -275,7 +274,7 @@
         this.__image = new Image();
 
         this.__image.onload = function () {
-          return _this.__callback();
+          return _this.__callback(_this);
         };
 
         this.__image.src = this.__current.img;
@@ -343,7 +342,11 @@
       this.detector = new TrunkDetector({
         video: this.video
       });
-      this.canvas = new Canvas('canvas', this.video, width, height);
+      this.canvas = new Canvas('camera', this.video, width, height);
+      this.__current = {
+        model: null,
+        size: Sizes.M
+      };
     }
 
     _createClass(ARApp, [{
@@ -352,24 +355,94 @@
         var _this = this;
 
         this.detector.onDetect(function (anchor) {
-          var jacket = new Jacket(Models.BROWN, Sizes.M, function () {
-            var offset = jacket.offset();
-            console.log(offset);
-            _this.canvas.anchor = {
-              img: jacket.img(),
-              x: anchor.x + offset.x,
-              y: anchor.y + offset.y
-            };
-          });
+          if (_this.__current.model) {
+            new Jacket(_this.__current.model, _this.__current.size, function (jacket) {
+              var offset = jacket.offset();
+              _this.canvas.anchor = {
+                img: jacket.img(),
+                x: anchor.x + offset.x,
+                y: anchor.y + offset.y - 20
+              };
+            });
+          }
         });
+      }
+    }, {
+      key: "jacket",
+      value: function jacket(model) {
+        switch (model) {
+          case "black":
+            this.__current.model = Models.BLACK;
+            break;
+
+          case "red":
+            this.__current.model = Models.RED;
+            break;
+
+          case "brown":
+            this.__current.model = Models.BROWN;
+            break;
+        }
+      }
+    }, {
+      key: "size",
+      value: function size(_size) {
+        if (Object.values(Sizes).includes(_size)) this.__current.size = _size;
       }
     }]);
 
     return ARApp;
   }();
 
-  var video = document.getElementById("video");
-  var app = new ARApp(video, 1024, 1024);
+  var UI =
+  /*#__PURE__*/
+  function () {
+    function UI() {
+      _classCallCheck(this, UI);
+
+      this.__callback = null;
+      this.__videoElem = document.getElementById("video");
+      this.__jacketElemList = document.querySelectorAll('.jacket');
+
+      this.__listeners();
+    }
+
+    _createClass(UI, [{
+      key: "onSelectJacket",
+      value: function onSelectJacket(callback) {
+        this.__callback = callback;
+      }
+    }, {
+      key: "__listeners",
+      value: function __listeners() {
+        var _this = this;
+
+        this.__jacketElemList.forEach(function (jacket) {
+          jacket.addEventListener("click", function () {
+            _this.__jacketElemList.forEach(function (it) {
+              return it.classList.remove('selected');
+            });
+
+            jacket.classList.add('selected');
+            if (_this.__callback) _this.__callback(jacket.getAttribute("data-jacket"));
+          });
+        });
+      }
+    }, {
+      key: "video",
+      get: function get() {
+        return this.__videoElem;
+      }
+    }]);
+
+    return UI;
+  }();
+
+  var ui = new UI();
+  var app = new ARApp(ui.video, 1024, 768);
+  ui.onSelectJacket(function (model) {
+    app.jacket(model);
+  });
   app.start();
 
 }());

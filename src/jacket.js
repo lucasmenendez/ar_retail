@@ -42,7 +42,7 @@ class Jacket {
     __init() {
         this.__image = new Image();
         
-        this.__image.onload = () => this.__callback();
+        this.__image.onload = () => this.__callback(this);
         this.__image.src = this.__current.img;
         this.__image.width = this.size.width;
         this.__image.height = this.size.height;

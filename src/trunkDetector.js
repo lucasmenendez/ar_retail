@@ -31,7 +31,6 @@ class TrunkDetector {
     onDetect(callback) { this.callback = callback; }
 
     ready() {
-        console.log("Detector started!");
         this.net.on("pose", res => this.detected(res[0]));
     }
 
@@ -51,7 +50,7 @@ class TrunkDetector {
         ];
 
         return {
-            x: (Math.min (...x) + Math.max (...x)) / 2,
+            x: pose.nose.x,
             y: (pose.nose.y + Math.min(...y)) / 2
         }
     }
