@@ -31,8 +31,8 @@ class Jacket {
         this.__current = model;
         this.__size = size;
         this.__base = {
-            width: 398,
-            height: 641
+            width: 300,
+            height: 483
         }
 
         this.__callback = onLoad;
@@ -56,18 +56,18 @@ class Jacket {
         switch(this.__size) {
             case Sizes.S:
                 return {
-                    width: this.__base.width - 10,
-                    height: this.__base.height - 10
+                    width: this.__base.width - 60,
+                    height: this.__base.height - 60
+                }
+            case Sizes.M:
+                return {
+                    width: this.__base.width - 40,
+                    height: this.__base.height - 40
                 }
             case Sizes.L:
                 return {
-                    width: this.__base.width + 10,
-                    height: this.__base.height + 10
-                }
-            case Sizes.XL:
-                return {
-                    width: this.__base.width + 20,
-                    height: this.__base.height + 20
+                    width: this.__base.width - 20,
+                    height: this.__base.height - 20
                 }
             default:
                 return this.__base

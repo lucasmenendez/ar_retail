@@ -41,7 +41,9 @@ class ARApp {
                         this.canvas.anchor = {
                             img: jacket.img(),
                             x: anchor.x + offset.x,
-                            y: anchor.y + offset.y - 20
+                            y: anchor.y + offset.y,
+                            w: jacket.size().width,
+                            h: jacket.size().height
                         }
                     }
                 );

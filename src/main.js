@@ -8,5 +8,9 @@ ui.onSelectJacket(model => {
     app.jacket(model);
 });
 
+ui.onSelectSize(size => {
+    app.size(size);
+});
+
 app.start();
 

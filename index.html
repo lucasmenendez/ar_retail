@@ -130,6 +130,7 @@
                 padding: 10px 15px;
                 background: #555;
                 font-size: 14px;
+                margin-top: -30px;
             }
 
             #controls .jacket .info {
@@ -155,13 +156,70 @@
                 color: red;
             }
 
-            #controls .jacket .link {
+            #current-jacket {
+                position: fixed;
+                left: 0;
+                bottom: 0;
+                width: 70%;
+                height: 120px;
+                background: black;
+                color: white;
+                padding: 30px;
+                transition: all .2s ease-in-out;
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            #current-jacket.show {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            #current-jacket p {
                 display: inline-block;
                 vertical-align: top;
-                width: 100%;
-                height: auto;
-                padding: 10px 20px;
-                margin: 30px 0 0;
+                width: auto;
+                height: 100%;
+                line-height: 60px;
+            }
+
+            #current-jacket #sizes {
+                display: inline-block;
+                vertical-align: top;
+                width: auto;
+                height: 60px;
+                padding: 0 30px;
+            }
+
+            #current-jacket #sizes .size-selector {
+                display: inline-block;
+                vertical-align: top;
+                width: 40px;
+                height: 40px;
+                margin: 10px 5px;
+                text-align: center;
+                line-height: 40px;
+                border: 1px solid white;
+                transition: all .2s ease-in-out;
+                cursor: pointer;
+            }
+
+            #current-jacket #sizes .size-selector:hover,
+            #current-jacket #sizes .size-selector.current {
+                background: white;
+                color: black;
+            }
+
+            #current-jacket #purchase-link {
+                position: absolute;
+                top: 40px;
+                right: 30px;
+                display: inline-block;
+                vertical-align: top;
+                width: auto;
+                height: 40px;
+                line-height: 40px;
+                padding: 0 20px;
                 text-align: center;
                 text-decoration: none; 
                 background: #044B7F;
@@ -169,6 +227,11 @@
                 text-decoration: none; 
                 border-radius: 6px;
                 font-size: 16px;
+                transition: all .2s ease-in-out;
+            }
+
+            #current-jacket #purchase-link:hover {
+                background: rgb(5, 109, 184);
             }
 
         </style>
@@ -183,10 +246,23 @@
         </header>
 
         <canvas id="camera"></canvas>
+
+        <section id="current-jacket">
+            <p>Select your size:</p>
+            <div id="sizes">
+                <span class="size-selector" data-value="S">S</span>
+                <span class="size-selector current" data-value="M">M</span>
+                <span class="size-selector" data-value="L">L</span>
+                <span class="size-selector" data-value="XL">XL</span>
+            </div>
+
+            <a href="" target="_blank" id="purchase-link">Purchase!</a>
+        </section>
+
         <section id="controls">
             <h2 class="title">Clothes selected</h2>
 
-            <div class="jacket" data-jacket="black">
+            <div class="jacket" data-model="black" data-url="https://www.stoneisland.com/es/stone-island/blazer_cod41890405tb.html">
                 <div class="thumbnail">
                     <img class="img" src="./assets/black.png"/>
                     <span class="price">799.99 €</span>
@@ -194,11 +270,10 @@
                 <div class="info">
                     <h3 class="title">A0129 GORE-TEX PACLITE® PRODUCT TECHNOLOGY WITH PRIMALOFT® INSULATION</h3>
                     <span class="delete" type="button">Remove item</span>
-                    <a href="https://www.stoneisland.com/es/stone-island/blazer_cod41890405tb.html" target="_blank" class="link">Purchase!</a>
                 </div>
             </div>
 
-            <div class="jacket" data-jacket="red">
+            <div class="jacket" data-model="red" data-url="https://www.stoneisland.com/es/stone-island/cazadora_cod41890734ur.html">
                 <div class="thumbnail">
                     <img class="img" src="./assets/red.png"/>
                     <span class="price">660.00 €</span>
@@ -206,11 +281,10 @@
                 <div class="info">
                     <h3 class="title">43031 DAVID LIGHT-TC WITH MICROPILE</h3>
                     <span class="delete" type="button">Remove item</span>
-                    <a href="https://www.stoneisland.com/es/stone-island/cazadora_cod41890734ur.html" target="_blank" class="link">Purchase!</a>
                 </div>
             </div>
 
-            <div class="jacket" data-jacket="brown">
+            <div class="jacket" data-model="brown" data-url="https://www.stoneisland.com/es/stone-island/chaqueton_cod41890540lb.html">
                 <div class="thumbnail">
                     <img class="img" src="./assets/brown.png"/>
                     <span class="price">799.99 €</span>
@@ -218,7 +292,6 @@
                 <div class="info">
                     <h3 class="title">70631 DAVID LIGHT-TC WITH MICROPILE</h3>
                     <span class="delete" type="button">Remove item</span>
-                    <a href="https://www.stoneisland.com/es/stone-island/chaqueton_cod41890540lb.html" target="_blank" class="link">Purchase!</a>
                 </div>
             </div>
         </section>

@@ -214,8 +214,10 @@
       value: function __drawImage(_ref3) {
         var img = _ref3.img,
             x = _ref3.x,
-            y = _ref3.y;
-        this.context.drawImage(img, x, y);
+            y = _ref3.y,
+            w = _ref3.w,
+            h = _ref3.h;
+        this.context.drawImage(img, x, y, w, h);
       }
     }]);
 
@@ -258,8 +260,8 @@
       this.__current = model;
       this.__size = size;
       this.__base = {
-        width: 398,
-        height: 641
+        width: 300,
+        height: 483
       };
       this.__callback = onLoad;
 
@@ -292,20 +294,20 @@
         switch (this.__size) {
           case Sizes.S:
             return {
-              width: this.__base.width - 10,
-              height: this.__base.height - 10
+              width: this.__base.width - 60,
+              height: this.__base.height - 60
+            };
+
+          case Sizes.M:
+            return {
+              width: this.__base.width - 40,
+              height: this.__base.height - 40
             };
 
           case Sizes.L:
             return {
-              width: this.__base.width + 10,
-              height: this.__base.height + 10
-            };
-
-          case Sizes.XL:
-            return {
-              width: this.__base.width + 20,
-              height: this.__base.height + 20
+              width: this.__base.width - 20,
+              height: this.__base.height - 20
             };
 
           default:
@@ -361,7 +363,9 @@
               _this.canvas.anchor = {
                 img: jacket.img(),
                 x: anchor.x + offset.x,
-                y: anchor.y + offset.y - 20
+                y: anchor.y + offset.y,
+                w: jacket.size().width,
+                h: jacket.size().height
               };
             });
           }
@@ -400,9 +404,13 @@
     function UI() {
       _classCallCheck(this, UI);
 
-      this.__callback = null;
-      this.__videoElem = document.getElementById("video");
+      this.__callbackJacket = null;
+      this.__callbackSize = null;
+      this.__videoElem = document.getElementById('video');
       this.__jacketElemList = document.querySelectorAll('.jacket');
+      this.__currentJacketElem = document.getElementById('current-jacket');
+      this.__purchaseLinkElem = document.getElementById('purchase-link');
+      this.__sizesElemList = document.querySelectorAll('.size-selector');
 
       this.__listeners();
     }
@@ -410,7 +418,12 @@
     _createClass(UI, [{
       key: "onSelectJacket",
       value: function onSelectJacket(callback) {
-        this.__callback = callback;
+        this.__callbackJacket = callback;
+      }
+    }, {
+      key: "onSelectSize",
+      value: function onSelectSize(callback) {
+        this.__callbackSize = callback;
       }
     }, {
       key: "__listeners",
@@ -418,15 +431,46 @@
         var _this = this;
 
         this.__jacketElemList.forEach(function (jacket) {
-          jacket.addEventListener("click", function () {
-            _this.__jacketElemList.forEach(function (it) {
-              return it.classList.remove('selected');
-            });
-
-            jacket.classList.add('selected');
-            if (_this.__callback) _this.__callback(jacket.getAttribute("data-jacket"));
+          jacket.addEventListener('click', function () {
+            return _this.__jacketSelected(jacket);
           });
         });
+
+        this.__sizesElemList.forEach(function (size) {
+          size.addEventListener('click', function () {
+            return _this.__sizeSelected(size);
+          });
+        });
+      }
+    }, {
+      key: "__jacketSelected",
+      value: function __jacketSelected(jacket) {
+        this.__jacketElemList.forEach(function (it) {
+          return it.classList.remove('selected');
+        });
+
+        jacket.classList.add('selected');
+
+        if (this.__callbackJacket) {
+          var model = jacket.getAttribute('data-model');
+          var url = jacket.getAttribute('data-url');
+
+          this.__currentJacketElem.classList.add('show');
+
+          this.__purchaseLinkElem.setAttribute('href', url);
+
+          this.__callbackJacket(model);
+        }
+      }
+    }, {
+      key: "__sizeSelected",
+      value: function __sizeSelected(size) {
+        this.__sizesElemList.forEach(function (it) {
+          return it.classList.remove('current');
+        });
+
+        size.classList.add('current');
+        if (this.__callbackSize) this.__callbackSize(size.getAttribute('data-value'));
       }
     }, {
       key: "video",
@@ -442,6 +486,9 @@
   var app = new ARApp(ui.video, 1024, 768);
   ui.onSelectJacket(function (model) {
     app.jacket(model);
+  });
+  ui.onSelectSize(function (size) {
+    app.size(size);
   });
   app.start();
 

@@ -40,8 +40,8 @@ class Canvas {
         this.context.fill();
     }
 
-    __drawImage({ img, x, y }) {
-        this.context.drawImage(img, x, y);
+    __drawImage({ img, x, y, w, h }) {
+        this.context.drawImage(img, x, y, w, h);
     }
 }
 
